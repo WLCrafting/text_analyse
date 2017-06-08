@@ -13,6 +13,16 @@ import jieba
 import re
 import jieba.analyse
 
+"""
+change frequenz of picked words to improve accuracy
+"""
+def freq_chg() :
+	dict_words = ['并网','潮汐能','充电桩','出清电量','储能','低碳','地热','电厂','电池','电动车','电动车电池','电动汽车','电改','电力负荷','电力改革','电力交易','电力金融衍生品','电力期货','电力市场','电力现货','电力销售','电力直接交易','电力中长期交易','电网','多能互补','分布式能源','风电','风光互补','风能','峰谷电价','负荷特性','光伏','合同电量','火电','家用电池','建筑节能','节能服务','可持续能源','可再生能源','垃圾焚烧','零碳','绿色电力','绿证','煤电','能效','能源','能源管理','能源互联网','能源结构','能源微网','配电','偏差考核','氢燃料','燃料','燃料电池','热电联产','售电','售电公示','售电公司','输配电','水电','太阳能','碳捕捉','碳交易','碳收集','替代能源','天然气','调频市场','微电网','系统调峰','新能源','新能源汽车','需求侧管理','蓄能','页岩气','用电量','智慧能源'];
+	for word in dict_words:
+	    jieba.suggest_freq(word, True)
+	return     
+
+
 df_org = pd.read_csv('content_compress.csv');
 
 li_org = [];
@@ -23,7 +33,8 @@ li_day = [];
 
 suburl = re.compile("\"http://(.+)\"") 
 sub1 = re.compile("nbsp")
-sub2 = re.compile("2017")
+sub2 = re.compile("\d")
+
 
 li_org=df_org.values.tolist()
 
@@ -51,7 +62,11 @@ for i in range(0, len(li_sort)):
         content_in_day += li_sort[i][1]
 
 # tf-inf statistic
+freq_chg()
 li_freq = []
+
+jieba.analyse.set_stop_words("extra_dict/stop_words.txt")
+
 for i in range(0, len(li_day)):
     tags = jieba.analyse.extract_tags(li_day[i][1], topK = 50, withWeight = True)
     li_freq.append([li_day[i][0], tags])
