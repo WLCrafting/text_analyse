@@ -12,10 +12,10 @@ import matplotlib.pyplot as plt
 import time
 import seaborn as sns
 def searchKey():
-    return("交易");
+    return("售电");
 
 res = [];
-for day in range(17277, 17317):
+for day in range(17301, 17331):
         try:
             read_key = pd.read_csv('book_tfidf/'+str(day)+'.csv')
             li_key = read_key.values.tolist()
