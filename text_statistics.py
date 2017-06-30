@@ -50,9 +50,9 @@ def Compare_freq(file_name_1, file_name_2):
                 break
         if str_mark == '':
             print(word, '新上榜， 排名', int(math.fabs(i)))
-            res.append([word, '上升', 100 - nt(math.fabs(i))])        
+            res.append([word, '上升', 100 - int(math.fabs(i))])        
     my_df = pd.DataFrame(res)
-    my_df.to_csv('word_frequency.csv', index=False, header=True, encoding='gbk')        
+    my_df.to_csv('freq/word_ranking_' + file_name_1 + '_vs_' + file_name_2 +'.csv', index=False, header=True, encoding='gbk')        
 
 def Analyze_freq():
     df_org = pd.read_csv('content_compress.csv');
@@ -87,8 +87,10 @@ def Analyze_freq():
     week_old = li_sort[0][0];
     content_in_day = "" 
     content_in_week = ""
+    content_in_all = ""
     # combine text of the same day
     for i in range(0, len(li_sort)):
+        content_in_all += li_sort[i][1]
         if (int(week_old) + 7 > int(li_sort[i][0])):
             content_in_week += li_sort[i][1]
         else:
@@ -112,7 +114,7 @@ def Analyze_freq():
     freq_chg()
     li_freq = []
 
-    jieba.analyse.set_stop_words("extra_dict/stop_words.txt")
+    jieba.analyse.set_stop_words("extra_dict/stop_words_non_power.txt")
 
     for i in range(0, len(li_day)):
         tags = jieba.analyse.extract_tags(li_day[i][1], topK = 100, withWeight = True)
@@ -124,7 +126,11 @@ def Analyze_freq():
         tags = jieba.analyse.extract_tags(li_week[i][1], topK = 100, withWeight = True)
         li_freq.append([li_week[i][0], tags])
         day_freq = pd.DataFrame(tags)     
-        day_freq.to_csv('book_tfidf/week_'+str(li_week[i][0])+'.csv',mode='w',index=False,encoding='UTF-8')    
+        day_freq.to_csv('book_tfidf/week_' + str(li_week[i][0]) + '.csv',mode = 'w', index = False, encoding = 'UTF-8') 
+
+    tags = jieba.analyse.extract_tags(content_in_all, topK = 100, withWeight = True)
+    day_freq = pd.DataFrame(tags)     
+    day_freq.to_csv('book_tfidf/all.csv',mode = 'w', index = False, encoding = 'gbk')       
     
 #==============================================================================
 # for i in range(len(li_freq) - 30, len(li_freq)):
@@ -135,7 +141,7 @@ def Analyze_freq():
 
 def main():
     Analyze_freq()
-    #Compare_freq('week_17333', 'week_17326')
+    Compare_freq('week_17318', 'week_17304')
 
 if __name__ == '__main__':
     main()
