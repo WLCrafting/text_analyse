@@ -18,6 +18,8 @@ import jieba
 import re
 import math
 import jieba.analyse
+import datetime
+import time
 
 """
 change frequenz of picked words to improve accuracy
@@ -26,7 +28,12 @@ def freq_chg() :
 	dict_words = ['并网','潮汐能','充电桩','出清电量','储能','低碳','地热','电厂','电池','电动车','电动车电池','电动汽车','电改','电力负荷','电力改革','电力交易','电力金融衍生品','电力期货','电力市场','电力现货','电力销售','电力直接交易','电力中长期交易','电网','多能互补','分布式能源','风电','风光互补','风能','峰谷电价','负荷特性','光伏','合同电量','火电','家用电池','建筑节能','节能服务','可持续能源','可再生能源','垃圾焚烧','零碳','绿色电力','绿证','煤电','能效','能源','能源管理','能源互联网','能源结构','能源微网','配电','偏差考核','氢燃料','燃料','燃料电池','热电联产','售电','售电公示','售电公司','输配电','水电','太阳能','碳捕捉','碳交易','碳收集','替代能源','天然气','调频市场','微电网','系统调峰','新能源','新能源汽车','需求侧管理','蓄能','页岩气','用电量','智慧能源','北京','天津','河北','山西','内蒙古','辽宁','吉林','黑龙江','上海','江苏','浙江','安徽','福建','江西','山东','河南','湖北','湖南','广东','广西','海南','重庆','四川','贵州','云南','西藏','陕西','甘肃','青海','宁夏','台湾','新疆','香港','澳门'];
 	for word in dict_words:
 	    jieba.suggest_freq(word, True)
-	return     
+	return
+
+def dayToStr(stamp):
+    return datetime.datetime.fromtimestamp(
+        int(stamp * 86400)
+        ).strftime('%Y-%m-%d')  
 
 def Compare_freq(file_name_1, file_name_2):
     df_f1 = pd.read_csv('book_tfidf/' + file_name_1 + '.csv')
@@ -120,17 +127,17 @@ def Analyze_freq():
         tags = jieba.analyse.extract_tags(li_day[i][1], topK = 100, withWeight = True)
         li_freq.append([li_day[i][0], tags])
         day_freq = pd.DataFrame(tags)     
-        day_freq.to_csv('book_tfidf/'+str(li_day[i][0])+'.csv',mode='w',index=False,encoding='UTF-8')
+        day_freq.to_csv('book_tfidf/日排名_从'+ str(dayToStr(li_day[i][0])) + '.csv',mode='w',index=False,encoding='UTF-8')
 
     for i in range(0, len(li_week)):
         tags = jieba.analyse.extract_tags(li_week[i][1], topK = 100, withWeight = True)
         li_freq.append([li_week[i][0], tags])
         day_freq = pd.DataFrame(tags)     
-        day_freq.to_csv('book_tfidf/week_' + str(li_week[i][0]) + '.csv',mode = 'w', index = False, encoding = 'UTF-8') 
+        day_freq.to_csv('book_tfidf/周排名_从' + str(dayToStr(li_week[i][0])) + '.csv',mode = 'w', index = False, encoding = 'UTF-8') 
 
     tags = jieba.analyse.extract_tags(content_in_all, topK = 100, withWeight = True)
     day_freq = pd.DataFrame(tags)     
-    day_freq.to_csv('book_tfidf/all.csv',mode = 'w', index = False, encoding = 'gbk')       
+    day_freq.to_csv('book_tfidf/all.csv', mode = 'w', index = False, encoding = 'gbk')       
     
 #==============================================================================
 # for i in range(len(li_freq) - 30, len(li_freq)):
@@ -141,8 +148,10 @@ def Analyze_freq():
 
 def main():
     Analyze_freq()
+    ## 排名比较功能
+    # @ 两个参数是比较的文件名，时间近的在前， 时间远的在后
     Compare_freq('week_17318', 'week_17304')
-
+    ## 排名比较功能
 if __name__ == '__main__':
     main()
         
